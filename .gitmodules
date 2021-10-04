@@ -1,0 +1,3 @@
+[submodule "external/midi_file"]
+	path = external/midi_file
+	url = https://github.com/craigsapp/midifile.git
