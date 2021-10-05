@@ -18,14 +18,14 @@ Note::Note(int index) {
     }
 
     static std::vector<std::string> note_keys {
-        "C1",
-        "D",
-        "E",
-        "F",
-        "G",
-        "A",
-        "B",
         "C2",
+        "B",
+        "A",
+        "G",
+        "F",
+        "E",
+        "D",
+        "C1",
     };
 
     m_noteKey = note_keys[index];
@@ -136,6 +136,14 @@ void Track::addSlot(SlotInfo &slot) {
     }
 }
 
+void Song::emptyInit(int trackCount, int measureCount) {
+    for(int i = 0; i < trackCount; i++) {
+        m_tracks.emplace_back(Track{});
+        for(int m = 0; m < measureCount; m++) {
+            m_tracks.back().m_measures.emplace_back(Measure{});
+        }
+    }
+}
 
 void Song::addSlot(SlotInfo slot) {
     Track* track{nullptr};
@@ -205,7 +213,6 @@ Song* Importer::import(const std::string &fname) {
 
 
     smf::MidiFile midifile(fname.c_str());
-    std::cout << "Import finished\n";
 
 //    midifile.doTimeAnalysis();
     auto linkedNoteCount = midifile.linkNotePairs();

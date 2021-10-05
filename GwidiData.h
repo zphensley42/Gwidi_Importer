@@ -10,15 +10,36 @@ namespace gwidi {
 namespace data {
 
 struct SlotInfo {
-    int octave;
-    int measure_index;
-    std::string note_key;
-    int length_in_slots;
-    int start_in_slots;  // slot index, 0 based
-    int channel;
-    std::string instrument;
-    int track;
-    bool is_held;
+    int octave{0};
+    int measure_index{0};
+    std::string note_key{0};
+    int length_in_slots{0};
+    int start_in_slots{0};  // slot index, 0 based
+    int channel{0};
+    std::string instrument{""};
+    int track{0};
+    bool is_held{false};
+    SlotInfo() = default;
+    SlotInfo(
+            int octave,
+            int measure_index,
+            std::string note_key,
+            int length_in_slots,
+            int start_in_slots,
+            int channel,
+            std::string instrument,
+            int track,
+            bool is_held) :
+            octave{octave},
+            measure_index{measure_index},
+            note_key{note_key},
+            length_in_slots{length_in_slots},
+            start_in_slots{start_in_slots},
+            channel{channel},
+            instrument{instrument},
+            track{track},
+            is_held{is_held} {
+    }
 };
 
 class Slot {
@@ -72,6 +93,10 @@ public:
     inline int octaveNum() {
         return m_octaveNum;
     }
+
+    inline std::vector<Note>& notes() {
+        return m_notes;
+    }
 private:
     friend class Measure;
     int m_octaveNum;
@@ -84,6 +109,10 @@ public:
     void addSlot(SlotInfo &slot);
     std::vector<Slot> slotsForParams(int octave, const std::string& note);
     std::vector<VerticalSlotRepr> slotsForParams(int slotIndex);
+
+    inline std::vector<Octave>& octaves() {
+        return m_octaves;
+    }
 private:
     std::vector<Octave> m_octaves;
 };
@@ -100,6 +129,10 @@ public:
     inline int channel() {
         return m_channel;
     }
+
+    inline std::vector<Measure>& measures() {
+        return m_measures;
+    }
 private:
     friend class Song;
     std::string m_instrument;
@@ -111,11 +144,16 @@ private:
 
 class Song {
 public:
+    Song() = default;
+    void emptyInit(int trackCount, int measureCount);
     void addSlot(SlotInfo slot);
 
     int measureCount();
     std::vector<Slot> slotsForParams(int track, int octave, const std::string& note);
     std::vector<VerticalSlotRepr> slotsForParams(int track, int slotIndex);
+    inline std::vector<Track>& tracks() {
+        return m_tracks;
+    }
 private:
     std::vector<Track> m_tracks;
 };
