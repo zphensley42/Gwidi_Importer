@@ -1,17 +1,13 @@
 cmake_minimum_required(VERSION 3.15)
-project(gwidi_importer)
-
-add_subdirectory(external/midi_file)
+project(Gwidi_Importer)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_library(gwidi_importer GwidiData.cc)
-target_link_libraries(gwidi_importer midifile)
-get_target_property(midifile_includes midifile INCLUDE_DIRECTORIES)
-target_include_directories(gwidi_importer PUBLIC ${midifile_includes})
+set(Gwidi_Importer_DIR ${CMAKE_CURRENT_LIST_DIR})
+find_package(Gwidi_Importer REQUIRED)
 
 add_executable(gwidi_importer_main main.cpp)
-target_link_libraries(gwidi_importer_main gwidi_importer)
+target_link_libraries(gwidi_importer_main Gwidi_Importer)
 
 
 
@@ -33,7 +29,7 @@ add_executable(
 )
 target_link_libraries(
         test_gwidi
-        gwidi_importer
+        Gwidi_Importer
         gtest_main
 )
 target_include_directories(test_gwidi PUBLIC ${CMAKE_CURRENT_LIST_DIR})

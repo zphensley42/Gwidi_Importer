@@ -2,6 +2,7 @@
 #include "MidiFile.h"
 #include <string>
 #include <iostream>
+#include <algorithm>
 
 namespace gwidi {
 namespace data {
