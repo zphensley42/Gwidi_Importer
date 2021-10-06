@@ -273,6 +273,7 @@ Song* Importer::import(const std::string &fname) {
                 int ticks_per_measure = 16;
                 int measure_index = note_start / ticks_per_measure;
 
+                song->setTempo(tempo);
                 song->addSlot({
                     note_octave,        // int octave;
                     measure_index,      // int measure_index;

@@ -147,6 +147,12 @@ public:
     Song() = default;
     void emptyInit(int trackCount, int measureCount);
     void addSlot(SlotInfo slot);
+    inline void setTempo(int tempo) {
+        m_tempo = tempo;
+    }
+    inline int tempo() const {
+        return m_tempo;
+    }
 
     int measureCount();
     std::vector<Slot> slotsForParams(int track, int octave, const std::string& note);
@@ -156,6 +162,7 @@ public:
     }
 private:
     std::vector<Track> m_tracks;
+    int m_tempo;
 };
 
 class Importer {
