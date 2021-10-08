@@ -49,7 +49,12 @@ Measure::Measure() {
 void Note::addSlot(SlotInfo &slot) {
     int slot_index = slot.start_in_slots % 16;
     if(slot_index < m_slots.size()) {
-        m_slots[slot_index].m_state = slot.is_held ? Slot::State::SLOT_HELD : Slot::State::SLOT_ACTIVATED;
+        if(!slot.is_activated) {
+            m_slots[slot_index].m_state = Slot::State::SLOT_NONE;
+        }
+        else {
+            m_slots[slot_index].m_state = slot.is_held ? Slot::State::SLOT_HELD : Slot::State::SLOT_ACTIVATED;
+        }
     }
 }
 
@@ -283,7 +288,8 @@ Song* Importer::import(const std::string &fname) {
                     instrumentChannel,  // int channel;
                     instrument,         // std::string instrument;
                     t,                  // int track;
-                    false       // bool is_held;
+                    false,       // bool is_held;
+                    true      // bool is_activated;
                 });
             }
         }

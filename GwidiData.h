@@ -19,6 +19,7 @@ struct SlotInfo {
     std::string instrument{""};
     int track{0};
     bool is_held{false};
+    bool is_activated{true};
     SlotInfo() = default;
     SlotInfo(
             int octave,
@@ -29,7 +30,8 @@ struct SlotInfo {
             int channel,
             std::string instrument,
             int track,
-            bool is_held) :
+            bool is_held,
+            bool is_activated) :
             octave{octave},
             measure_index{measure_index},
             note_key{note_key},
@@ -38,7 +40,8 @@ struct SlotInfo {
             channel{channel},
             instrument{instrument},
             track{track},
-            is_held{is_held} {
+            is_held{is_held},
+            is_activated{is_activated} {
     }
 };
 
