@@ -1,9 +1,12 @@
 #ifndef GWIDI_IMPORTER_GWIDIDATA_H
 #define GWIDI_IMPORTER_GWIDIDATA_H
 
+#define DEBUG_SAVE_LOAD true
+
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <sstream>
 
 
 namespace gwidi {
@@ -163,7 +166,20 @@ public:
     inline std::vector<Track>& tracks() {
         return m_tracks;
     }
+
+    void saveAsBinary(std::ostream& os, int selectedTrack);
 private:
+#ifdef DEBUG_SAVE_LOAD
+    static std::ofstream& debugOutFile(bool open = false);
+#endif
+
+    void writeToStream(const std::string& label, int64_t labelData, std::ostream& os, const char* data, std::streamsize n) {
+        std::stringstream ss;
+        ss << labelData;
+        writeToStream(label, ss.str(), os, data, n);
+    }
+    void writeToStream(const std::string& label, const std::string& labelData, std::ostream& os, const char* data, std::streamsize n);
+
     std::vector<Track> m_tracks;
     int m_tempo;
 };

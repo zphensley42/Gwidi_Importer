@@ -3,6 +3,9 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include <bitset>
+
+#define DEBUG_SAVE_LOAD true
 
 namespace gwidi {
 namespace data {
@@ -335,6 +338,73 @@ std::string Importer::translateKeyVal(int keyVal) {
     }
 
     return "";
+}
+#ifdef DEBUG_SAVE_LOAD
+std::ofstream& Song::debugOutFile(bool open) {
+    static std::ofstream debugOutInstance;
+    if(open) {
+        debugOutInstance.open("debug_save_output.txt", std::ios::out);
+    }
+    return debugOutInstance;
+}
+#endif
+
+
+void Song::writeToStream(const std::string& label, const std::string& labelData, std::ostream &os, const char *data, std::streamsize n) {
+    os.write(data, n);
+#ifdef DEBUG_SAVE_LOAD
+    static std::string newlineStr = "\n";
+    debugOutFile().write(label.c_str(), label.size());
+    debugOutFile().write("  ", 2);
+    debugOutFile().write(labelData.c_str(), labelData.size());
+    debugOutFile().write(newlineStr.c_str(), newlineStr.size());
+#endif
+}
+
+void Song::saveAsBinary(std::ostream& os, int selectedTrack) {
+#ifdef DEBUG_SAVE_LOAD
+    debugOutFile(true);
+#endif
+
+    // Store tempo
+    writeToStream("tempo", m_tempo, os, reinterpret_cast<char*>(&m_tempo), sizeof(int));
+
+    // Store selected track info (just number for now)
+    writeToStream("selectedTrack", selectedTrack, os, reinterpret_cast<char*>(&selectedTrack), sizeof(int));
+
+    auto &track = m_tracks.at(selectedTrack);
+    auto &measures = track.measures();
+
+    auto numSlotsHorizontal = slotsForParams(selectedTrack, 0, "A").size();
+    auto numOctavesVertical = measures.at(0).octaves().size();
+    auto numNotesInOctave = measures.at(0).octaves().at(0).notes().size();
+
+    // Store size of slots (horizontal)
+    writeToStream("numSlotsHorizontal", numSlotsHorizontal, os, reinterpret_cast<char*>(&numSlotsHorizontal), sizeof(int));
+    // Store size of total octaves (vertical)
+    writeToStream("numOctavesVertical", numOctavesVertical, os, reinterpret_cast<char*>(&numOctavesVertical), sizeof(int));
+    // Store size of slots in each octave (vertical)
+    writeToStream("numNotesInOctave", numNotesInOctave, os, reinterpret_cast<char*>(&numNotesInOctave), sizeof(int));
+
+    // Store vertical slices of slots
+    for(int i = 0; i < numSlotsHorizontal; i++) {
+        auto slice = slotsForParams(selectedTrack, i);
+        for(auto& slot : slice) {
+            // Each slot is stored as:   <slot#><slot octave><slot note size><slot note><slot state>
+            writeToStream("slotNum", i, os, reinterpret_cast<char*>(&i), sizeof(int));
+            writeToStream("slotOctave", slot.octave_num, os, reinterpret_cast<char*>(&slot.octave_num), sizeof(int));
+            int slotNoteSize = slot.note.size();
+            writeToStream("slotNoteSize", slotNoteSize, os, reinterpret_cast<char*>(&slotNoteSize), sizeof(int));
+            auto noteStr = slot.note.c_str();
+            writeToStream("slotNoteStr", slot.note, os, noteStr, slotNoteSize);
+            auto state = slot.slot.state();
+            writeToStream("slotState", static_cast<int64_t>(state), os, reinterpret_cast<char*>(&state), sizeof(Slot::State));
+        }
+    }
+
+#ifdef DEBUG_SAVE_LOAD
+    debugOutFile().close();
+#endif
 }
 
 }
